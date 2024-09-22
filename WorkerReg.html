@@ -8,11 +8,12 @@
     <title>Become a Partner</title>
     <link rel="stylesheet" href="WorkerReg.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        integrity="sha384-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26" crossorigin="anonymous">
+    <!-- Correct Font Awesome link without integrity attribute -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <style>
+        /* Additional styles can be here or in WorkerReg.css */
         #map {
             height: 400px;
             width: 100%;
@@ -21,8 +22,34 @@
 
         .search-container {
             margin-bottom: 10px;
+            display: flex;
         }
 
+        .search-container input {
+            flex: 1;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+        }
+
+        .search-container button {
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-left: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        .search-container button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Modal styles can be moved to WorkerReg.css */
         .modal {
             display: none;
             position: fixed;
@@ -32,16 +59,17 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgb(0,0,0);
-            background-color: rgba(0,0,0,0.4);
+            background-color: rgba(0, 0, 0, 0.4);
         }
 
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto;
+            margin: 5% auto;
             padding: 20px;
             border: 1px solid #888;
             width: 80%;
+            max-width: 800px;
+            border-radius: 8px;
         }
 
         .close {
@@ -49,13 +77,58 @@
             float: right;
             font-size: 28px;
             font-weight: bold;
+            cursor: pointer;
         }
 
         .close:hover,
         .close:focus {
             color: black;
             text-decoration: none;
+        }
+
+        .location-input {
+            display: flex;
+            align-items: center;
+        }
+
+        .location-input input {
+            flex: 1;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+        }
+
+        .location-input button {
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-left: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 0 4px 4px 0;
             cursor: pointer;
+        }
+
+        .location-input button:hover {
+            background-color: #218838;
+        }
+
+        .submit-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -97,7 +170,7 @@
             <div class="form-group">
                 <label for="location"><i class="fas fa-map-marker-alt"></i> Preferred Working Location</label>
                 <div class="location-input">
-                    <input type="text" id="location" name="location" placeholder="Enter your hometown" required>
+                    <input type="text" id="location" name="location" placeholder="Enter your hometown" required readonly>
                     <button type="button" id="mapBtn" title="Select from Map"><i class="fas fa-map"></i></button>
                 </div>
             </div>
@@ -113,14 +186,16 @@
             <h2>Select Your Location</h2>
             <div class="search-container">
                 <input type="text" id="searchBox" placeholder="Search for a location" />
-                <button id="searchBtn">Search</button>
+                <button id="searchBtn"><i class="fas fa-search"></i> Search</button>
             </div>
             <div id="map"></div>
             <button id="selectLocation" class="submit-btn">Select Location</button>
         </div>
     </div>
 
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet Control Geocoder -->
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -131,49 +206,67 @@
             const selectLocationBtn = document.getElementById('selectLocation');
             const locationInput = document.getElementById('location');
             const searchBox = document.getElementById('searchBox');
-            let map;
-            let marker;
+            let mapInitialized = false;
+            let map, marker;
 
-            // Initialize Leaflet Map
+            // Initialize Leaflet Map with Satellite View
             function initMap() {
                 const defaultLocation = [20.2961, 85.8245]; // Bhubaneswar coordinates
-                if (!map) {
+                if (!mapInitialized) {
                     map = L.map('map').setView(defaultLocation, 13);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        maxZoom: 19,
-                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    }).addTo(map);
 
-                    // Add satellite view
-                    L.tileLayer('https://{s}.tiles.mapbox.com/styles/v1/mapbox/satellite-v9/{z}/{x}/{y}@2x.png', {
+                    // Add satellite tile layer from Esri
+                    const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
                         maxZoom: 19,
-                        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    }).addTo(map);
-                    
+                        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                    });
+
+                    // Add OpenStreetMap tile layer
+                    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '&copy; OpenStreetMap contributors'
+                    });
+
+                    // Add layer control to switch between satellite and OSM
+                    const baseMaps = {
+                        "Satellite": satellite,
+                        "Street Map": osm
+                    };
+                    osm.addTo(map); // Add OSM layer by default
+                    L.control.layers(baseMaps).addTo(map);
+
                     marker = L.marker(defaultLocation, { draggable: true }).addTo(map);
 
+                    // Update input on marker drag end
                     marker.on('dragend', function () {
                         const pos = marker.getLatLng();
                         fetchAddress(pos.lat, pos.lng);
                     });
 
+                    // Update marker position and input on map click
                     map.on('click', function (e) {
                         marker.setLatLng(e.latlng);
                         fetchAddress(e.latlng.lat, e.latlng.lng);
                     });
+
+                    mapInitialized = true;
                 }
             }
 
-            // Fetch address based on latitude and longitude
+            // Fetch address from coordinates using Nominatim
             function fetchAddress(lat, lng) {
-                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
                     .then(response => response.json())
                     .then(data => {
-                        locationInput.value = data.display_name || "Location not found";
+                        if (data && data.display_name) {
+                            locationInput.value = data.display_name;
+                        } else {
+                            locationInput.value = "Location not found";
+                        }
                     })
                     .catch(err => {
                         console.error('Error fetching address:', err);
-                        locationInput.value = "Address not found";
+                        locationInput.value = "Error fetching address";
                     });
             }
 
@@ -188,6 +281,7 @@
                 mapModal.style.display = 'none';
             });
 
+            // Close modal when clicking outside the modal content
             window.onclick = function (event) {
                 if (event.target == mapModal) {
                     mapModal.style.display = 'none';
@@ -201,30 +295,13 @@
                 mapModal.style.display = 'none';
             });
 
-            // Search functionality
-            const geocoder = L.Control.Geocoder.nominatim();
-
-            document.getElementById('searchBtn').addEventListener('click', () => {
-                const query = searchBox.value;
-                geocoder.geocode(query, (results) => {
-                    if (results.length) {
-                        const latlng = results[0].center;
-                        map.setView(latlng, 13);
-                        marker.setLatLng(latlng);
-                        fetchAddress(latlng.lat, latlng.lng);
-                    } else {
-                        alert('Location not found. Please try another search.');
-                    }
-                });
-            });
-
             // Handle Form Submission
             workerForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const formData = new FormData(workerForm);
 
                 try {
-                    const response = await fetch('http://localhost:5500/api/workers', {
+                    const response = await fetch('http://localhost:3000/api/workers', {
                         method: 'POST',
                         body: formData
                     });
@@ -232,6 +309,11 @@
                     if (response.ok) {
                         alert('Registration successful!');
                         workerForm.reset();
+                        if (mapInitialized) {
+                            // Reset marker position to default
+                            marker.setLatLng([20.2961, 85.8245]);
+                            map.setView([20.2961, 85.8245], 13);
+                        }
                     } else {
                         const error = await response.json();
                         alert(`Error: ${error.message}`);
