@@ -1,0 +1,499 @@
+/* General reset for better styling */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+}
+
+.header {
+  background-color: #fff;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 15px;
+}
+
+/* Logo Styling */
+.logo-container img {
+  width: 150px;
+  height: auto;
+}
+
+/* Search Form & Location Box (Desktop) */
+.search-location-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+  /* Search Bar Styling */
+  .search-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 450px; /* Fixed width to prevent layout issues */
+    height: 50px;
+    background: #f1f1f1;
+    border-radius: 20px;
+    padding: 2px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  /* Input Styling */
+  .search-input {
+    width: 80%;
+    height: 100%;
+    border: none;
+    outline: none;
+    padding-left: 10px;
+    font-size: 16px;
+    color: #333;
+    background: none;
+    transition: all 0.2s ease;
+  }
+
+  /* Input Focus */
+  .search-input:focus {
+    width: 85%; /* Slight expansion on focus for a subtle effect */
+  }
+
+  /* Search Button Styling */
+  .search-button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: #ff5e57;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .search-button:hover {
+    background: #ff3d2e;
+    transform: scale(1.1); /* Minimal scaling effect on hover */
+  }
+
+  /* Search Icon */
+  .search-icon {
+    width: 20px;
+    height: 20px;
+    color: white;
+  }
+
+
+/* Bookings & Cart (Desktop) */
+.bookings-cart-container {
+  display: flex;
+  gap: 20px;
+}
+
+.bookings-cart-container .nav-link {
+  text-decoration: none;
+  color: #007bff;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.bookings-cart-container .nav-link:hover {
+  color: #0056b3;
+}
+
+/* Login Button */
+.login-container .btn {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-container .btn:hover {
+  background-color: #0056b3;
+}
+
+/* Hamburger Menu (Visible on Small Screens) */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.hamburger .bar {
+  width: 25px;
+  height: 3px;
+  background-color: #333;
+  transition: all 0.3s ease;
+}
+
+.hamburger.active .bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger.active .bar:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active .bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+
+
+
+/* Mobile Navigation Menu */
+.mobile-nav {
+  position: fixed;
+  top: 0;
+  right: -300px; /* Initially offscreen */
+  height: 100vh;
+  width: 300px;
+  background-color: #fff;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.2);
+  transition: right 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.mobile-nav.active {
+  right: 0; /* Slide in */
+}
+
+.mobile-nav .nav-link {
+  text-decoration: none;
+  color: #333;
+  font-size: 18px;
+  margin: 20px 0;
+  transition: color 0.3s ease;
+}
+
+.mobile-nav .nav-link:hover {
+  color: #007bff;
+  background-color: #e7f1ff; /* Change background on hover */
+  padding: 10px; /* Add padding for hover effect */
+  border-radius: 4px; /* Rounded corners on hover */
+}
+
+.mobile-nav .btn {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.mobile-nav .btn:hover {
+  background-color: #0056b3;
+}
+
+/* Map Modal */
+.map-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  z-index: 10000;
+}
+
+.map-modal.active {
+  display: block;
+}
+
+.map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.map-header h2 {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.map-header .btn {
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+/* Hide mobile navbar by default */
+.mobile-navbar, .mobile-menu-slider, .menu-overlay {
+  display: none;
+}
+
+.header {
+  background-color: #fff;
+  padding: 10px 0;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Hamburger styles */
+.hamburger, .mobile-hamburger {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 20px;
+}
+
+/* Hamburger styles */
+.hamburger:hover, .mobile-hamburger:hover {
+  width: 25px;
+  height:25px;
+}
+
+.bar {
+  width: 25px;
+  height: 3px;
+  background-color: #000;
+  margin: 3px 0;
+}
+
+
+/* Mobile Navbar */
+.mobile-nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #fff;
+}
+
+.mobile-search-input {
+  width: 92%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  font-size: 16px;
+}
+
+/* Search bar hover effect */
+.mobile-search-input:hover {
+  box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+  transform: scale(1.02);
+}
+
+.mobile-search-input:focus {
+  outline: none;
+  border-color: #007BFF;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+/* Mobile Menu Slider */
+.mobile-menu-slider {
+  border-radius: 9px;
+  position: fixed;
+  top: 0;
+  right: -80%;
+  width: 300px;
+  height: 300px; /* Reduce height to fit the 4 elements */
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -5px 0 10px rgba(0,0,0,0.1);
+  transition: right 0.3s ease-in-out;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.mobile-menu-content {
+  display: flex;
+  flex-direction: column;
+  margin-top: 30px;
+  gap: 10px;
+}
+
+.mobile-menu-item {
+  padding: 10px;
+  text-align: left;
+  background-color: #eee;
+  border-radius: 5px;
+  text-decoration: none;
+  color: #333;
+  transition: background-color 0.3s ease-in-out, transform 0.2s;
+}
+
+.mobile-menu-item:hover {
+  background-color: #ddd;
+  transform: scale(1.05);
+}
+
+/* Close button for slider */
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Background overlay */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 999;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Show mobile navbar in mobile view */
+@media (max-width: 768px) {
+  /* Hide desktop navbar */
+  .header {
+    display: none;
+  }
+
+  /* Show mobile navbar */
+  .mobile-navbar {
+    display: block;
+  }
+}
+
+/* Slider Menu Open */
+.mobile-menu-open {
+  right: 0;
+}
+
+/* Overlay visible */
+.overlay-active {
+  display: block;
+  opacity: 1;
+}
+
+
+
+/* Container styling */
+.loc-box,.Dloc-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px; /* Adjust as per your layout */
+  margin: 0 auto;
+}
+
+#location-container{
+  margin-left: 40px;
+}
+
+.loc-input-container, .Dloc-input-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+/* Location Icon (Pin) */
+.loc-icon,.Dloc-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  stroke: #ff5722; /* Zomato/Swiggy-like color */
+}
+
+/* Location text */
+.location-text,.Dlocation-text {
+  font-size: 16px;
+  color: #555;
+  flex-grow: 1;
+  padding-right: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Button Styling */
+.btnMob,.DbtnMob {
+  background-color: #ff5722; /* Zomato/Swiggy-like color */
+  color: #fff;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.btnMob:hover,.DbtnMob:hover{
+  background-color: #e64a19;
+}
+
+
+
+.header {
+  transition: top 0.3s ease; /* Smooth transition for showing/hiding */
+  position: fixed; /* Fix the header to the top */
+  top: 0; /* Start at the top */
+  width: 100%; /* Full width */
+  z-index: 1000; /* Ensure it is above other elements */
+}
+
+.hide-navbar {
+  top: -110px; /* Adjust this value based on your header height */
+}
+
+/* Optional: For mobile view adjustments */
+.mobile-navbar {
+  transition: top 0.3s ease; /* Smooth transition for mobile navbar */
+  position: fixed; /* Fix the mobile navbar to the top */
+  top: 0; /* Start at the top */
+  width: 100%; /* Full width */
+  z-index: 1000; /* Ensure it is above other elements */
+}
+
+.mobile-navbar.hide-navbar {
+  top: -60px; /* Adjust this value based on your mobile navbar height */
+}

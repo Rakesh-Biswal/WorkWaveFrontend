@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IoT Course Website</title>
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="navbarStyle.css">
+  <link rel="stylesheet" href="Map.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+
+      <!-- Logo Container -->
+      <div class="logo-container">
+        <img
+          src="https://lever-client-logos.s3.us-west-2.amazonaws.com/c5afaa33-96cf-4fc4-85eb-b922d1ed43ee-1623935837605.png"
+          width="150px" height="40px" alt="Logo">
+      </div>
+
+      <!-- Search and Location Container -->
+      <div class="search-location-container">
+        <!-- Search Functionality -->
+        <form action="#" method="get" class="search-form">
+          <input type="text" placeholder="Search..." name="search" class="search-input">
+          <button type="submit" class="search-button" aria-label="Search">
+            <svg xmlns="http://www.w3.org/2000/svg" class="search-icon" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 105.65 5.65a7.5 7.5 0 0011.35 11.35z" />
+            </svg>
+          </button>
+        </form>
+
+        <div class="Dloc-box" id="location-container">
+          <div class="loc-input-container">
+            <!-- Location Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="loc-icon" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 2c5.523 0 10 4.477 10 10 0 4.032-3.197 7.531-7.456 10.15a1.292 1.292 0 01-1.088.15C7.794 19.53 4.001 16.032 4 12 4 6.477 8.477 2 12 2z" />
+            </svg>
+            <!-- Display the current location -->
+            <span id="current-location" class="Dlocation-text">Fetching location...</span>
+            <!-- Map button for mobile view -->
+            <button id="show-map" class="DbtnMob">Show Map</button>
+          </div>
+        </div>
+
+
+
+      </div>
+
+      <!-- Bookings and Cart Container (Desktop) -->
+      <div class="bookings-cart-container">
+        <a href="#booking" class="nav-link">Booking</a>
+        <a href="#cart" class="nav-link">Cart</a>
+      </div>
+
+      <!-- Login Container -->
+      <div class="login-container">
+        <a href="login.html" class="btn">Log In</a>
+      </div>
+    </div>
+
+  </header>
+
+  <!-- Map Modal -->
+  <div id="map-modal" class="map-modal">
+    <div class="map-header">
+      <h2>Set Location</h2>
+      <button id="close-map" class="btn">X</button>
+    </div>
+    <div id="map" style="height: 500px; width: 100%;"></div>
+    <input type="text" id="map-search" placeholder="Search location..." />
+    <button id="search-map" class="btn">Search</button>
+    <button id="toggle-satellite" class="btn">Satellite View</button>
+    <button id="set-location" class="btn">Set Location</button>
+  </div>
+
+
+  <!-- Mobile Navbar (Only for Mobile View) -->
+  <div class="mobile-navbar">
+    <div class="mobile-nav-container">
+      <div class="mobile-logo">
+        <img
+          src="https://lever-client-logos.s3.us-west-2.amazonaws.com/c5afaa33-96cf-4fc4-85eb-b922d1ed43ee-1623935837605.png"
+          width="120px" height="30px" alt="Logo">
+      </div>
+      <div class="mobile-search">
+        <input type="text" placeholder="Search..." class="mobile-search-input">
+      </div>
+      <div class="mobile-hamburger" id="mobile-hamburger">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+    </div>
+
+    <!-- Background Overlay (Hidden by default) -->
+    <div class="menu-overlay" id="menu-overlay"></div>
+
+    <!-- Mobile Menu Slider (Initially Hidden) -->
+    <div class="mobile-menu-slider" id="mobile-menu-slider">
+      <button class="close-btn" id="close-slider">&times;</button>
+      <div class="mobile-menu-content">
+
+        <div class="loc-box" id="loc-con">
+          <div class="loc-input-container">
+            <!-- Location Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="loc-icon" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 2c5.523 0 10 4.477 10 10 0 4.032-3.197 7.531-7.456 10.15a1.292 1.292 0 01-1.088.15C7.794 19.53 4.001 16.032 4 12 4 6.477 8.477 2 12 2z" />
+            </svg>
+            <!-- Display the current location -->
+            <span id="cur-loc" class="location-text">Fetching location...</span>
+            <!-- Map button for mobile view -->
+            <button id="show-mapMob" class="btnMob">Map</button>
+          </div>
+        </div>
+
+        <a href="#booking" class="mobile-menu-item">Bookings</a>
+        <a href="#cart" class="mobile-menu-item">Cart</a>
+        <a href="login.html" class="mobile-menu-item">Login</a>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section id="hero" class="hero">
+    <div class="hero-content">
+      <h1 class="hero-title">Find Your Service Expert Now!</h1>
+      <p class="hero-subtitle">Book services instantly from trusted professionals.</p>
+      <div class="search-bar">
+        <input type="text" placeholder="Search for a service..." class="search-input" />
+        <button class="search-btn">Search</button>
+      </div>
+    </div>
+    <div class="hero-image">
+      <img src="https://img.freepik.com/premium-photo/construction-worker-hands-up-labor-day_33835-1476.jpg"
+        alt="Service Booking" />
+    </div>
+  </section>
+
+
+
+  <!-- Services Section -->
+  <section id="services" class="services">
+    <h2>Our Top Services</h2>
+    <div class="service-grid">
+      <!-- Card 1 -->
+      <div class="service-item">
+        <img
+          src="https://content.jdmagicbox.com/comp/bhubaneshwar/z7/0674px674.x674.240302193819.i8z7/catalogue/manoj-plumbing-contractor-irc-village-bhubaneshwar-plumbers-lt2igb8g0o.jpg"
+          alt="Service 1">
+        <h3>Plumbing Services</h3>
+        <p>Book skilled plumbers for any repairs.</p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="service-item">
+        <img
+          src="https://www.weslingelectric.com/wp-content/uploads/2014/09/Saint-Peters-Missouri-Electricians-Small.jpg"
+          alt="Service 2">
+        <h3>Electrical Maintenance</h3>
+        <p>Certified electricians at your doorstep.</p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="service-item">
+        <img src="https://main-cdn.grabone.co.nz/goimage/600x415/f10f506ceebae6de78b93166dda235f9d6d0367b.jpg"
+          alt="Service 3">
+        <h3>Home Cleaning</h3>
+        <p>Professional cleaning services at your convenience.</p>
+      </div>
+
+    </div>
+
+    <!-- Initially Hidden Services -->
+    <div class="extra-services" style="display: none;">
+      <!-- Card 4 -->
+      <div class="service-item">
+        <img src="https://airtasker-seo-assets-prod.s3.amazonaws.com/en_GB/1696200423601-carpenter-cutting-wood.jpg"
+          alt="Service 4">
+        <h3>Carpentry Work</h3>
+        <p>Skilled carpenters for furniture repairs.</p>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="service-item">
+        <img src="https://appliancerepairexpert.ca/wp-content/uploads/2022/03/Hero-img-Brand.jpg" alt="Service 5">
+        <h3>Appliance Repair</h3>
+        <p>Expert technicians for home appliances.</p>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="service-item">
+        <img src="https://african.land/oc-content/plugins/blog/img/blog/172.jpg" alt="Service 6">
+        <h3>Painting Services</h3>
+        <p>Get your home or office painted professionally.</p>
+      </div>
+
+      <!-- Card 7 -->
+      <div class="service-item">
+        <img src="https://5.imimg.com/data5/ANDROID/Default/2020/8/ZA/BC/QY/107372859/product-jpeg.jpg" alt="Service 7">
+        <h3>AC Installation & Repair</h3>
+        <p>Affordable air conditioning services.</p>
+      </div>
+
+      <!-- Card 8 -->
+      <div class="service-item">
+        <img
+          src="https://agentselect-cms.s3.ap-southeast-2.amazonaws.com/hs-downsizing-tips/220128_gardening_landscaping/Gardener.jpg"
+          alt="Service 8">
+        <h3>Gardening Services</h3>
+        <p>Maintain your garden with expert gardeners.</p>
+      </div>
+
+      <!-- Card 9 -->
+      <div class="service-item">
+        <img
+          src="https://www.commandone.com/wp-content/uploads/2017/05/4-reasons-why-you-need-a-security-camera-for-your-business.jpeg"
+          alt="Service 9">
+        <h3>Home Security Setup</h3>
+        <p>Install advanced home security systems.</p>
+      </div>
+    </div>
+
+    <!-- Show More Button -->
+    <div class="show-more">
+      <button id="showMoreBtn" class="btn">Show More <span>&rarr;</span></button>
+    </div>
+  </section>
+
+
+  <!-- Slider Section -->
+  <section class="slider-section">
+    <div class="slider-images">
+      <div class="slider-item active">
+        <img src="https://hicare.in/blog/wp-content/uploads/2022/10/10-Reasons-You-Should-Hire-A-Professional-Home-Cleaner-HiCare-2048.1365.jpg" alt="Service 1">
+      </div>
+      <div class="slider-item">
+        <img
+          src="https://media.gettyimages.com/id/1422099563/photo/real-life-female-electrician-at-work.jpg?s=612x612&w=gi&k=20&c=TgPpC-Y7a91A2c7RI81HAkkljOwVAPLhZxKg3_KPTNA="
+          alt="Service 2">
+      </div>
+      <div class="slider-item">
+        <img
+          src="https://media.istockphoto.com/id/1341381755/photo/plumber-fixing-pipe-in-bathroom-plumbing-maintenance.jpg?s=612x612&w=0&k=20&c=yy6E3NKovrmjJOSwnnRlj8EjxgRn87QNIw4EPHDlnUQ="
+          alt="Service 3">
+      </div>
+    </div>
+    <div class="slider-title">
+      <h1 id="slider-title">Discover Exclusive Services</h1>
+    </div>
+    <div class="slider-controls">
+      <button class="prev">&#10094;</button>
+      <button class="next">&#10095;</button>
+    </div>
+    <div class="slider-dots">
+      <span class="dot active"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </section>
+
+
+
+
+  <!-- Blog Section -->
+  <section id="blog" class="blog">
+    <h2>Latest Articles</h2>
+    <div class="blog-grid">
+      <div class="blog-item">
+        <img
+          src="https://www.veritis.com/wp-content/uploads/2023/04/Top-6-IoT-Trends-Will-Fuel-Business-Expansion-in-2024.jpg"
+          alt="Blog 1">
+        <h3>IoT Trends 2024</h3>
+        <p>Explore the latest trends in IoT.</p>
+        <a href="#" class="btn">Read More</a>
+      </div>
+      <div class="blog-item">
+        <img src="https://assets.techrepublic.com/uploads/2021/02/istock-1284697820.jpg" alt="Blog 2">
+        <h3>Best Practices in IoT</h3>
+        <p>Learn the best practices for IoT development.</p>
+        <a href="#" class="btn">Read More</a>
+      </div>
+      <div class="blog-item">
+        <img src="https://d2ds8yldqp7gxv.cloudfront.net/Blog+Explanatory+Images/IoT+Security+Challenges+2.webp"
+          alt="Blog 3">
+        <h3>IoT Security Challenges</h3>
+        <p>Understand the security challenges in IoT.</p>
+        <a href="#" class="btn">Read More</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Q&A Section -->
+  <section id="qa" class="qa">
+    <h2>Q&A Section</h2>
+    <div class="qa-grid">
+      <div class="qa-item">
+        <h3>What is IoT?</h3>
+        <div class="qa-answer">
+          <p>IoT stands for Internet of Things. It refers to a network of physical objects...</p>
+        </div>
+      </div>
+      <div class="qa-item">
+        <h3>How does IoT work?</h3>
+        <div class="qa-answer">
+          <p>IoT works by connecting physical devices to the internet, allowing them to collect...</p>
+        </div>
+      </div>
+      <div class="qa-item">
+        <h3>What are the benefits of IoT?</h3>
+        <div class="qa-answer">
+          <p>The benefits of IoT include improved efficiency, real-time data monitoring...</p>
+        </div>
+      </div>
+      <div class="qa-item">
+        <h3>What are the challenges of IoT?</h3>
+        <div class="qa-answer">
+          <p>Challenges of IoT include data security, privacy concerns, and the complexity...</p>
+        </div>
+      </div>
+      <div class="qa-item">
+        <h3>What is the future of IoT?</h3>
+        <div class="qa-answer">
+          <p>The future of IoT looks promising with advancements in AI, 5G technology...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Us Section -->
+  <section id="about-us" class="about-us">
+    <h2>About Us</h2>
+    <p>We are dedicated to providing top-notch IoT education and resources to help you stay ahead in the technology
+      industry.</p>
+    <a href="#contact" class="btn">Contact Us</a>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="contact">
+    <h2>Contact Us</h2>
+    <form class="contact-form">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name">
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email">
+      <label for="message">Message:</label>
+      <textarea id="message" name="message"></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+  </section>
+
+  <!-- Footer Section -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>About Us</h3>
+        <p>Information about the company</p>
+      </div>
+      <div class="footer-section">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="#hero">Home</a></li>
+          <li><a href="#courses">Courses</a></li>
+          <li><a href="#slider">Gallery</a></li>
+          <li><a href="#blog">Blog</a></li>
+          <li><a href="#qa">Q&A</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Follow Us</h3>
+        <div class="social-links">
+          <a href="#">Facebook</a>
+          <a href="#">Twitter</a>
+          <a href="#">Instagram</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 Your Company. All rights reserved.</p>
+    </div>
+  </footer>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="index.js"></script>
+  <script src="LocAccess.js"></script>
+  <script>
+    // Variables to keep track of the last scroll position
+    let lastScrollTop = 0;
+    const header = document.querySelector('.header');
+    const headerMob = document.querySelector('.mobile-navbar');
+
+    // Function to handle the scroll event
+    window.addEventListener('scroll', function () {
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+      if (currentScroll > lastScrollTop) {
+        // Scroll Down - Hide the navbar
+        header.classList.add('hide-navbar');
+        headerMob.classList.add('hide-navbar');
+      } else {
+        // Scroll Up - Show the navbar
+        header.classList.remove('hide-navbar');
+        headerMob.classList.remove('hide-navbar');
+      }
+      lastScrollTop = currentScroll <= 0 ? 0 : currentScroll; // For Mobile or negative scrolling
+    });
+
+
+    let slideIndex = 0;
+    const slides = document.querySelectorAll('.slider-item');
+    const dots = document.querySelectorAll('.dot');
+    const title = document.getElementById('slider-title');
+
+    // Function to show slides with animations
+    function showSlide(index) {
+      slides.forEach((slide, idx) => {
+        slide.classList.remove('active');
+        dots[idx].classList.remove('active');
+      });
+
+      slides[index].classList.add('active');
+      dots[index].classList.add('active');
+
+      // Animate title on mobile
+      if (window.innerWidth <= 768) {
+        title.style.animation = 'slideInTitle 1s ease forwards';
+      }
+    }
+
+    // Functionality for the next and previous buttons
+    function nextSlide() {
+      slideIndex = (slideIndex + 1) % slides.length;
+      showSlide(slideIndex);
+    }
+
+    function prevSlide() {
+      slideIndex = (slideIndex - 1 + slides.length) % slides.length;
+      showSlide(slideIndex);
+    }
+
+    document.querySelector('.next').addEventListener('click', nextSlide);
+    document.querySelector('.prev').addEventListener('click', prevSlide);
+
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        slideIndex = index;
+        showSlide(slideIndex);
+      });
+    });
+
+    // Auto-slide every 5 seconds
+    setInterval(nextSlide, 5000);
+
+    // Initialize the first slide
+    showSlide(slideIndex);
+
+  </script>
+</body>
+
+</html>
